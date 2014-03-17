@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">HelloApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="button_send">Send</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_display_message">Display Message</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_database">DatabaseActivity</string>
+    <string name="find_text">Find</string>
+    <string name="add_string">Add</string>
+    <string name="delete_text">Delete</string>
+    <string name="list_text">List</string>
+    <string name="productid_text">ProductID</string>
+    <string name="productquantity_text">Product Quantity</string>
+    <string name="idvalue_text">None</string>
+    <string name="productname_text">Product Name</string>
+    <string name="title_activity_display_item">DisplayItemActivity</string>
+
+</resources>
