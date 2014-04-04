@@ -3,5 +3,8 @@
     <string name="app_name">Todo List</string>
     <string name="new_task_voice_trigger">add a task</string>
     <string name="show_tasks_voice_trigger">show my tasks</string>
+    <string name="save_task">Save</string>
+    <string name="cancel_save_task">Cancel</string>
+    <string name="record_task_again">Record again</string>
 
 </resources>

@@ -8,7 +8,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 public class NewTaskActivity extends Activity {
@@ -18,10 +21,14 @@ public class NewTaskActivity extends Activity {
 
 		setContentView(R.layout.new_task_screen);
 
+		recordTask();
+	}
+
+	private void recordTask() {
 		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		startActivityForResult(intent, 0);
 	}
-
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent data) {
@@ -33,4 +40,41 @@ public class NewTaskActivity extends Activity {
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
+	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.new_task_menu, menu);
+        return true;
+    }
+	
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+              openOptionsMenu();
+              return true;
+          }
+          return false;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_menu_item:
+                // TODO: save item
+            	// TODO: show "saved" for 2 sec, then...
+            	finish();
+                return true;
+            case R.id.record_again_menu_item:
+            	recordTask();
+            	return true;
+            case R.id.cancel_menu_item:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
 }
