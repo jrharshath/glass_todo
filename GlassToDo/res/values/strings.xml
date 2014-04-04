@@ -1,5 +1,7 @@
 <resources>
 
-    <string name="app_name">GlassTodo</string>
+    <string name="app_name">Todo List</string>
+    <string name="new_task_voice_trigger">add a task</string>
+    <string name="show_tasks_voice_trigger">show my tasks</string>
 
 </resources>

@@ -2,6 +2,8 @@
     package="com.jugaad.glasstodo"
     android:versionCode="1"
     android:versionName="1.0" >
+    
+    <!--  icon by http://thenounproject.com/term/check-box/876/ -->
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -11,7 +13,39 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/GlassTheme" >
+        
+         <activity
+            android:name="com.jugaad.glasstodo.activity.NewTaskActivity"
+            android:enabled="true"
+            android:label="@string/new_task_voice_trigger" >
+
+            <!-- android:theme="@style/MenuTheme" -->
+            <intent-filter>
+                <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.google.android.glass.VoiceTrigger"
+                android:resource="@xml/new_task_voice_trigger" />
+        </activity>
+        
+        <activity
+            android:name="com.jugaad.glasstodo.activity.TaskListActivity"
+            android:enabled="true"
+            android:label="@string/show_tasks_voice_trigger" >
+
+            <!-- android:theme="@style/MenuTheme" -->
+            <intent-filter>
+                <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.google.android.glass.VoiceTrigger"
+                android:resource="@xml/show_tasks_voice_trigger" />
+        </activity>
+        
+       
     </application>
 
 </manifest>
