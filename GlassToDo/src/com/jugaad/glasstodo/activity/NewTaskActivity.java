@@ -3,6 +3,7 @@ package com.jugaad.glasstodo.activity;
 import java.util.List;
 
 import com.jugaad.glasstodo.R;
+import com.jugaad.glasstodo.model.TaskItem;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +16,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 public class NewTaskActivity extends Activity {
+	
+	private TaskItem createdTask = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -35,10 +39,19 @@ public class NewTaskActivity extends Activity {
 		if (requestCode == 0 && resultCode == RESULT_OK) {
 			List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 			String spokenText = results.get(0);
+			createdTask = new TaskItem(spokenText);
 
-			((TextView) findViewById(R.id.taskDescription)).setText(spokenText);
+			showTaskOnView(createdTask);
+		} else {
+			// TODO: show a "recording failed, try again" message
 		}
+
 		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	private void showTaskOnView(TaskItem task) {
+		// populate all fields of the taskItem into the view
+		((TextView) findViewById(R.id.taskDescription)).setText(task.getTaskDescription());
 	}
 	
     @Override
@@ -50,9 +63,9 @@ public class NewTaskActivity extends Activity {
 	
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && createdTask != null) {
               openOptionsMenu();
-              return true;
+              return true; 
           }
           return false;
     }
@@ -61,7 +74,7 @@ public class NewTaskActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save_menu_item:
-                // TODO: save item
+                // TODO: save the "createdTask" object to database
             	// TODO: show "saved" for 2 sec, then...
             	finish();
                 return true;
