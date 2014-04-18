@@ -1,9 +1,7 @@
 package com.jugaad.glasstodo.view;
 
 public interface ReorderListener {
-	void move(int index, boolean up);
+	void move(int index, boolean up); // return new index
 
-	void doneDragging();
-
-	void startDragging();
+	void selectItem(int index);
 }

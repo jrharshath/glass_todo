@@ -1,9 +1,11 @@
 package com.jugaad.glasstodo.view;
 
+import com.google.android.glass.media.Sounds;
 import com.google.android.glass.touchpad.Gesture;
 import com.google.android.glass.touchpad.GestureDetector;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,6 +17,7 @@ public class ReorderableListView extends ListView {
 
 	private GestureDetector mGestureDetector;
 	private boolean dragging = false;
+	private int selectionIndex;
 
 	public ReorderableListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -35,6 +38,10 @@ public class ReorderableListView extends ListView {
 
 	private ReorderListener mListener;
 
+	private AudioManager mAudio;
+	
+	
+
 	private void init(Context context) {
 		mGestureDetector = new GestureDetector(context);
 
@@ -44,25 +51,29 @@ public class ReorderableListView extends ListView {
 		mGestureDetector.setScrollListener(new GestureDetector.ScrollListener() {
 			@Override
 			public boolean onScroll(float displacement, float delta, float velocity) {
-				if(!dragging) {
-					return false;
-				}
-
 				accumulatedDelta += delta;
 				Log.i(TAG, "Delta = " +delta + ", accumulated = " + accumulatedDelta);
 
 				if(accumulatedDelta >= minDelta || accumulatedDelta <= -minDelta) {
-
 					boolean moveUp = accumulatedDelta < 0;
 					accumulatedDelta = 0;
+					
+					if(selectionIndex<=0 && moveUp) { return true; }
+					if(selectionIndex>=getAdapter().getCount()-1 && !moveUp) { return true; }
+					
+					int newIndex = selectionIndex + (moveUp ? -1 : 1);
+					
+					mAudio.playSoundEffect(Sounds.SELECTED);
 
-					// move the current selection
-					int selIndex = list.getSelectedItemPosition();
-
-					if(mListener != null) {
-						mListener.move(selIndex, moveUp);
+					if(dragging) {
+						if(mListener != null) {
+							mListener.move(selectionIndex, moveUp);
+							selectionIndex = newIndex;
+						}
+					} else {
+						selectionIndex = newIndex;
 					}
-
+					setSelection(newIndex);
 				}
 				return true;
 			}
@@ -77,33 +88,51 @@ public class ReorderableListView extends ListView {
 						Log.i(TAG, "Stop drag mode");
 						dragging = false;
 						accumulatedDelta = 0;
-						mListener.doneDragging();
+						mAudio.playSoundEffect(Sounds.TAP);
+						return false;
 					}
 					return true;
 				}
 
-				// if not dragging
-				if (gesture == Gesture.LONG_PRESS) {
+				// start dragging on long press
+				if (gesture == Gesture.LONG_PRESS && mListener != null) {
 					Log.i(TAG, "Start drag mode");
 					dragging = true;
-					mListener.startDragging();
+					mAudio.playSoundEffect(Sounds.TAP);
 					return true;
 				} 
+				
+				// signal selection on tap
+				if(gesture == Gesture.TAP && mListener != null) {
+					Log.i(TAG, "Select item");
+					mListener.selectItem(selectionIndex);
+					mAudio.playSoundEffect(Sounds.TAP);
+					return true;
+				}
 
 				return false;
 			}
 		});
+		
+		selectionIndex = 0;
+		setSelection(selectionIndex);
 	}	
 
 	@Override
 	public boolean onGenericMotionEvent(MotionEvent event) {
 		if (mGestureDetector != null) {
-			return mGestureDetector.onMotionEvent(event);
+			boolean handled = mGestureDetector.onMotionEvent(event);
+			if(handled) return false;
+			else return super.onGenericMotionEvent(event);
 		}
-		return false;
+		return super.onGenericMotionEvent(event);
 	}
 
 	public void addReorderListener(ReorderListener listener) {
 		mListener = listener;		
+	}
+
+	public void setAudio(AudioManager audio) {
+		this.mAudio = audio;		
 	}
 }

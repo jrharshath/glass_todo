@@ -5,14 +5,36 @@
     android:orientation="vertical" >
 
     <TextView
+        android:id="@+id/newTaskLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/taskDescription"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:text="new task"
+        android:textColor="#777777" />
+
+    <TextView
         android:id="@+id/taskDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/newTaskLabel"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="TaskDescription"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+     <TextView
+         android:id="@+id/messageTextView"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentRight="true"
+         android:layout_marginBottom="16dp"
+         android:layout_marginRight="20dp"
+         android:text="tap to save"
+         android:textSize="16sp"
+         android:visibility="invisible" />
 
 </RelativeLayout>

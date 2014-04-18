@@ -5,6 +5,10 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.google.android.glass.media.Sounds;
 import com.jugaad.glasstodo.R;
@@ -31,34 +35,29 @@ public class TaskListActivity extends ListActivity implements ReorderListener {
 		mListView.addReorderListener(this);
 		
 		mValues = new TaskItem[] {
-				new TaskItem("task 1"),
-				new TaskItem("task 2"),
-				new TaskItem("task 3"),
-				new TaskItem("task 4"),
-				new TaskItem("task 5"),
-				new TaskItem("task 6"),
-				new TaskItem("task 7"),
-				new TaskItem("task 8")
+				new TaskItem("finish ubicomp project"),
+				new TaskItem("stop wasting time"),
+				new TaskItem("finish presentation"),
+				new TaskItem("buy groceries"),
+				new TaskItem("clear room"),
+				new TaskItem("learn to play the guitar"),
+				new TaskItem("play more badminton"),
+				new TaskItem("win raquetball tourney")
 		};
 		
 		mAudio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
 		mAdapter = new TaskItemListAdapter(this, mValues);
 		setListAdapter(mAdapter);
+		mListView.setAudio(mAudio);
 	}
 
 	@Override
 	public void move(int index, boolean up) {
 		Log.i(TAG, "moving item " + index + " " + (up?"up":"down"));
-		
+
 		int i = index;
-		
-		if(i<=0 && up) { return; }
-		if(i>=mValues.length-1 && !up) { return; }
-		
-		mAudio.playSoundEffect(Sounds.SELECTED);
-		
-		int j = i + (up ? -1 : 1);
+		int j = index + (up ? -1 : 1);
 		
 		TaskItem vi = mValues[i];
 		TaskItem vj = mValues[j];
@@ -66,18 +65,11 @@ public class TaskListActivity extends ListActivity implements ReorderListener {
 		mValues[i] = vj;
 		mValues[j] = vi;
 		
-		mAdapter.notifyDataSetChanged();
-		
-		mListView.setSelection(j);
+		mAdapter.notifyDataSetChanged(); // TODO: move to view later
 	}
 
 	@Override
-	public void doneDragging() {
-		mAudio.playSoundEffect(Sounds.TAP);
-	}
-
-	@Override
-	public void startDragging() {
-		mAudio.playSoundEffect(Sounds.TAP);
+	public void selectItem(int index) {
+		// TODO launch single task activity 		
 	}
 }
