@@ -1,17 +1,26 @@
 package com.example.glasstodo;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.File;
 import java.util.ArrayList;
 
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,9 +41,12 @@ public class DatabaseActivity extends Activity {
 	public final static String TASK_LIST = "com.example.myfirstapp.TASK_LIST";
 	protected static final int RESULT_SPEECH = 1;
 	static final int SAMPLE_RATE = 8000;
-	public final static String AUDIO_RECORDER_FOLDER = "RecordedAudio";
-	private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".txt";
-    private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
+	//public final static String AUDIO_RECORDER_FOLDER = "RecordedAudio";
+	//private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".txt";
+	//private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
+	private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".pcm";
+    
+    Boolean recording;
 	
 	TextView idView;
 	EditText taskDescription;
@@ -56,14 +68,16 @@ public class DatabaseActivity extends Activity {
 	}
 
 	public void textOrRecording(View view){
-		char connected = 5;
+		
+		char connected = 0;
 		if (connected==1){
 			newOnlineTaskItem(view);
 		}else if (connected==0){
 			//do recording
-			//create content service
-			//store recording in content service
-			//create db entry using URI of stored item 
+			//store recording
+			//create db entry using URI of stored item
+			generateRecording(view);
+			
 		}else{
 			newPhoneTaskItem(view);
 		}
@@ -133,8 +147,9 @@ public class DatabaseActivity extends Activity {
         //if(!file.exists()){
         //        file.mkdirs();
         //}
+		//return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
         return ("msg_" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
-        //return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
+        
 	}
 	
 	public void showToDo (View view){
@@ -146,7 +161,7 @@ public class DatabaseActivity extends Activity {
     		  stringTaskList.add(temp);
     	  }
     	   
-    	  
+    	  System.out.println(stringTaskList);
     	  Intent intent = new Intent(this, DisplayTaskListActivity.class);
   		  intent.putStringArrayListExtra(TASK_LIST, stringTaskList);
   		  //intent.putExtra(PROD_LIST, productNameList.toString());
@@ -161,13 +176,118 @@ public class DatabaseActivity extends Activity {
  	   taskDescription.setText("");
 	}
 	
-	public void generateRecording(){
+	public void generateRecording(View view){
 		
-		int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+		/*int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 		byte[] buffer = new byte[bufferSize];
-		AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+		AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);*/
+		Thread recordThread = new Thread(new Runnable(){
+		    @Override
+		    public void run() {
+		     recording = true;
+		     startRecord();
+		    }
+		    
+		   });
+		   
+		   recordThread.start();
 		
 	}
+	
+	private void startRecord(){
+		MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
+	 	TaskItem item = new TaskItem("test");
+	 	String fname = this.getFilename();
+	 	item.setTaskrecording(fname);
+	 	dbHandler.addTaskItem(item);
+	 	System.out.println(fname);
+		File file = new File(fname); 
+	    
+		  try {
+		   
+			  OutputStream outputStream = openFileOutput(fname, Context.MODE_PRIVATE);
+			  BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+			  DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
+		   
+			  int minBufferSize = AudioRecord.getMinBufferSize(11025, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+		   
+			  short[] audioData = new short[minBufferSize];
+		   
+			  AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,11025,
+					  AudioFormat.CHANNEL_IN_MONO,
+					  AudioFormat.ENCODING_PCM_16BIT,
+					  minBufferSize);
+		   
+			  audioRecord.startRecording();
+		   
+			  while(recording){
+				  int numberOfShort = audioRecord.read(audioData, 0, minBufferSize);
+				  	for(int i = 0; i < numberOfShort; i++){
+				  		dataOutputStream.writeShort(audioData[i]);
+				  	}
+			  }
+		      System.out.println(audioData.length);
+		      System.out.println(dataOutputStream.size());
+			  audioRecord.stop();
+			  dataOutputStream.close();
+		   
+		  } catch (IOException e) {
+			  e.printStackTrace();
+		  }
+		
+	}
+	
+	public void playRecording(View view){
+		MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
+		TaskItem task = dbHandler.findTaskItem(Integer.parseInt(idView.getText().toString()));
+		System.out.println("Testing Starting to read");
+		String fileName = task.getTaskrecodingString();
+		
+        int shortSizeInBytes = Short.SIZE/Byte.SIZE;
+        
+  
+        try {
+        	FileInputStream fis = openFileInput(fileName);
+        	int bufferSizeInBytes = (int)(fis.getChannel().size()/shortSizeInBytes);
+        	if (bufferSizeInBytes == 0){
+            	bufferSizeInBytes = 2000000;
+            	System.out.println("had to set it manually");
+            }
+        	BufferedInputStream bufferedInputStream = new BufferedInputStream(fis);
+        	DataInputStream dataInputStream = new DataInputStream(bufferedInputStream);
+        	
+        	short[] audioData = new short[bufferSizeInBytes];
+        	int i = 0;
+        	while(dataInputStream.available() > 0){
+        		audioData[i] = dataInputStream.readShort();
+        		i++;
+        	}
+   
+        	dataInputStream.close();
+   
+        	AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,11025,
+        			AudioFormat.CHANNEL_OUT_MONO,
+        			AudioFormat.ENCODING_PCM_16BIT,
+        			bufferSizeInBytes,
+        			AudioTrack.MODE_STREAM);
+   
+        	audioTrack.play();
+        	audioTrack.write(audioData, 0, bufferSizeInBytes);
+
+   
+        } catch (FileNotFoundException e) {
+        	e.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+		
+	}
+	
+	public void stopRecording(View view){
+		recording=false;
+	}
+	
+	
 	public void handleSpeech(){
           Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 

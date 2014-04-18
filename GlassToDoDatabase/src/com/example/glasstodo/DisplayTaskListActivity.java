@@ -29,12 +29,17 @@ public class DisplayTaskListActivity extends Activity implements OnItemClickList
 		setupActionBar();
 		Intent intent = getIntent();
 		ArrayList<String> stringList = intent.getStringArrayListExtra(DatabaseActivity.TASK_LIST);
-		
+		System.out.println(stringList);
 		ArrayList<TaskItem> completeList = new ArrayList<TaskItem> ();
 		
 		for (String strTask : stringList){
 			String [] eachItem = strTask.split("[|]");
-			TaskItem tempItem = new TaskItem (Integer.valueOf(eachItem[0]),eachItem[1]);
+			TaskItem tempItem;
+			if (eachItem.length == 1){
+				tempItem = new TaskItem (Integer.valueOf(eachItem[0]),"blah");	
+			}else{
+				tempItem = new TaskItem (Integer.valueOf(eachItem[0]),eachItem[1]);
+			}
 			completeList.add(tempItem);
 		}
 		
