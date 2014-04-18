@@ -22,6 +22,7 @@ public class ReorderableListView extends ListView {
 	public ReorderableListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(context);
+		
 	}
 
 	public ReorderableListView(Context context) {
@@ -52,7 +53,7 @@ public class ReorderableListView extends ListView {
 			@Override
 			public boolean onScroll(float displacement, float delta, float velocity) {
 				accumulatedDelta += delta;
-				Log.i(TAG, "Delta = " +delta + ", accumulated = " + accumulatedDelta);
+				Log.d(TAG, "Delta = " +delta + ", accumulated = " + accumulatedDelta);
 
 				if(accumulatedDelta >= minDelta || accumulatedDelta <= -minDelta) {
 					boolean moveUp = accumulatedDelta < 0;
@@ -85,10 +86,11 @@ public class ReorderableListView extends ListView {
 
 				if(dragging) {
 					if (gesture == Gesture.TAP || gesture == Gesture.LONG_PRESS) {
-						Log.i(TAG, "Stop drag mode");
+						Log.d(TAG, "Stop drag mode");
 						dragging = false;
 						accumulatedDelta = 0;
 						mAudio.playSoundEffect(Sounds.TAP);
+						mListener.stopDragging(selectionIndex);
 						return false;
 					}
 					return true;
@@ -96,15 +98,16 @@ public class ReorderableListView extends ListView {
 
 				// start dragging on long press
 				if (gesture == Gesture.LONG_PRESS && mListener != null) {
-					Log.i(TAG, "Start drag mode");
+					Log.d(TAG, "Start drag mode");
 					dragging = true;
 					mAudio.playSoundEffect(Sounds.TAP);
+					mListener.startDragging(selectionIndex);
 					return true;
 				} 
 				
 				// signal selection on tap
 				if(gesture == Gesture.TAP && mListener != null) {
-					Log.i(TAG, "Select item");
+					Log.d(TAG, "Select item");
 					mListener.selectItem(selectionIndex);
 					mAudio.playSoundEffect(Sounds.TAP);
 					return true;
@@ -134,5 +137,9 @@ public class ReorderableListView extends ListView {
 
 	public void setAudio(AudioManager audio) {
 		this.mAudio = audio;		
+	}
+
+	public int getSelectionIndex() {
+		return selectionIndex;
 	}
 }

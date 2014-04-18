@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.jugaad.glasstodo.R;
-import com.jugaad.glasstodo.db.TodoItemDb;
+import com.jugaad.glasstodo.db.TaskItemDb;
 import com.jugaad.glasstodo.model.TaskItem;
-import com.jugaad.glasstodo.model.MyDBHandler;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -25,7 +24,7 @@ import android.widget.TextView;
 public class NewTaskActivity extends Activity {
 
 	private TaskItem createdTask = null;
-	private TodoItemDb db;
+	private TaskItemDb db;
 	private Timer saveTimer;
 	
 	private final int SPEECH = 10284;
@@ -33,7 +32,7 @@ public class NewTaskActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		db = new TodoItemDb();
+		db = new TaskItemDb(this);
 
 		setContentView(R.layout.new_task_screen);
 
@@ -55,10 +54,8 @@ public class NewTaskActivity extends Activity {
 
 			showTaskOnView(createdTask);
 			
-			final NewTaskActivity a = this;
-			
 			saveTimer = new Timer();
-			final int[] c = new int[]{5};
+			final int[] c = new int[]{3};
 			saveTimer.schedule(new TimerTask() {
 				@Override
 				public void run() {
@@ -145,7 +142,7 @@ public class NewTaskActivity extends Activity {
 	}
 
 	private void saveTask() {
-		db.saveItem(createdTask);
+		db.saveTaskItem(createdTask);
 		((TextView) findViewById(R.id.newTaskLabel)).setVisibility(View.VISIBLE);
 		((TextView) findViewById(R.id.taskDescription)).setVisibility(View.VISIBLE);
 		((TextView) findViewById(R.id.messageTextView)).setVisibility(View.VISIBLE);
@@ -155,6 +152,6 @@ public class NewTaskActivity extends Activity {
 			@Override
 			public void run() {
 				finish();				
-			} }, 1500);
+			} }, 1000);
 	}
 }

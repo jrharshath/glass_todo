@@ -3,6 +3,8 @@ package com.jugaad.glasstodo.model;
 import com.jugaad.glasstodo.R;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +27,19 @@ public class TaskItemListAdapter extends ArrayAdapter<TaskItem> {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.task_list_item, parent, false);
 
-		TextView textView = (TextView) rowView.findViewById(R.id.taskDescription);		    
-		textView.setText(values[position].getTaskDescription());
+		TaskItem taskItem = values[position];
+		
+		TextView tv = (TextView) rowView.findViewById(R.id.taskDescription);		    
+		tv.setText(taskItem.getTaskDescription());
+		if(taskItem.isDone()) {
+			tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		} else {
+			tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+		}
+		
+		if(taskItem.grabbed) {
+			rowView.setBackgroundColor(Color.parseColor("#77aa77"));
+		}
 
 		return rowView;
 	}

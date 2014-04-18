@@ -6,5 +6,10 @@
     <string name="save_task">Save</string>
     <string name="cancel_save_task">Cancel</string>
     <string name="record_task_again">Record again</string>
+    <string name="mark_done">Mark done</string>
+    <string name="mark_not_done">Mark not done</string>
+    <string name="edit_task">Record again</string>
+    <string name="delete_task">Delete</string>
 
 </resources>
+
