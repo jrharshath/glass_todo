@@ -156,9 +156,7 @@ public class NewTaskActivity extends Activity {
 				finish();				
 			} }, 1500);
 	}
-<<<<<<< HEAD
-=======
-	
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -197,7 +195,5 @@ public class NewTaskActivity extends Activity {
                 return super.onOptionsItemSelected(item);
         }
     }
->>>>>>> 04e4e3b46a774783beacad077a72d63f18eeb65a
-
 
 }
