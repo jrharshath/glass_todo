@@ -3,12 +3,11 @@ package com.jugaad.glasstodo.activity;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import com.jugaad.glasstodo.R;
 import com.jugaad.glasstodo.db.TodoItemDb;
 import com.jugaad.glasstodo.model.TaskItem;
 import com.jugaad.glasstodo.model.MyDBHandler;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+@SuppressLint("HandlerLeak")
 public class NewTaskActivity extends Activity {
 
 	private TaskItem createdTask = null;
@@ -88,6 +88,7 @@ public class NewTaskActivity extends Activity {
         	((TextView) findViewById(R.id.messageTextView)).setText("Saving in "+msg.what+" seconds\ntap for options");
         }
     };
+    
     private Handler saveHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -156,44 +157,4 @@ public class NewTaskActivity extends Activity {
 				finish();				
 			} }, 1500);
 	}
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.new_task_menu, menu);
-        return true;
-    }
-	
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && createdTask != null) {
-              openOptionsMenu();
-              return true; 
-          }
-          return false;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_menu_item:
-                // DONE: x-save the "createdTask" object to database
-            	MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
-            	TextView tv = (TextView) findViewById(R.id.taskDescription);
-         	   	TaskItem task = new TaskItem(tv.getText().toString());
-         	   	dbHandler.addTaskItem(task);
-            	// TODO: show "saved" for 2 sec, then...
-            	finish();
-                return true;
-            case R.id.record_again_menu_item:
-            	recordTask();
-            	return true;
-            case R.id.cancel_menu_item:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
 }
