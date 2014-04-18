@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.jugaad.glasstodo.R;
 import com.jugaad.glasstodo.model.TaskItem;
+import com.jugaad.glasstodo.model.MyDBHandler;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -74,7 +75,11 @@ public class NewTaskActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save_menu_item:
-                // TODO: save the "createdTask" object to database
+                // DONE: x-save the "createdTask" object to database
+            	MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
+            	TextView tv = (TextView) findViewById(R.id.taskDescription);
+         	   	TaskItem task = new TaskItem(tv.getText().toString());
+         	   	dbHandler.addTaskItem(task);
             	// TODO: show "saved" for 2 sec, then...
             	finish();
                 return true;
