@@ -21,6 +21,10 @@
     <string name="list_text">List</string>
     <string name="taskid_text">Task ID</string>
     
+    <string name="record">Record</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    
     <string name="idvalue_text">None</string>
     <string name="taskdesc_text">Task Description</string>
     
